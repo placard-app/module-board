@@ -56,6 +56,12 @@ export function wrapLabel(text: string, width = 13): string[] {
   if (line) lines.push(line)
   return lines
 }
+export function labelError(label: string): string | null {
+  if (!label?.trim()) return "Enter a printed label"
+  if (label.length > 80 || wrapLabel(label).length > 4)
+    return "Shorten this label so it fits on the board"
+  return null
+}
 export function designError(d: Design): string | null {
   if (d.templateVersion !== 1) return "Unsupported board template"
   if (!d.title?.trim() || d.title.length > 60) return "Use a board title of 1–60 characters"
@@ -64,8 +70,7 @@ export function designError(d: Design): string | null {
   if (new Set(d.properties.map((p) => p.placeId)).size !== 22) return "Each place must be unique"
   for (const p of d.properties) {
     if (!p.placeId || !p.name || !categories.includes(p.category)) return "Invalid place"
-    if (!p.label?.trim() || p.label.length > 80 || wrapLabel(p.label).length > 4)
-      return `Shorten the printed label for ${p.name}`
+    if (labelError(p.label)) return `Shorten the printed label for ${p.name}`
   }
   return null
 }

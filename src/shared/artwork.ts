@@ -1,4 +1,4 @@
-import { colors, colorAt, slots, wrapLabel, type Design } from "./board.ts"
+import { colors, colorAt, slots, wrapLabel, labelError, type Design } from "./board.ts"
 const esc = (s: string) =>
   s.replace(
     /[&<>"']/g,
@@ -35,7 +35,7 @@ const icons: Record<string, string> = {
   trail: "M-16 12L-4-12 6 7 12-4 18 12M-4-12v-5h10",
   other: "M0-16c-18 0-18 18 0 32 18-14 18-32 0-32z",
 }
-export function boardSvg(board: Design): string {
+export function boardSvg(board: Design, interactive = false): string {
   let tiles = ""
   for (let i = 0; i < 40; i++) {
     const side = Math.floor(i / 10),
@@ -48,7 +48,13 @@ export function boardSvg(board: Design): string {
     const label = p?.label ?? fixed[i]
     const wrapped = wrapLabel(label, corner ? 15 : 13)
     const lines = wrapped.length > 4 ? ["Shorten label"] : wrapped
-    tiles += `<g transform="rotate(${side * 90} 500 500) translate(${x} 870)"><rect width="${w}" height="130" fill="#fffaf0" stroke="#334a43" stroke-width="1.5"/><rect width="${w}" height="22" fill="${color}"/><g transform="translate(${w / 2} 44) scale(.55)" fill="none" stroke="#334a43" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="${icons[p?.category ?? "other"] ?? icons.other}"/></g>${lines.map((line, n) => `<text x="${w / 2}" y="${65 + n * 13}" text-anchor="middle" font-size="10.5">${esc(line)}</text>`).join("")}</g>`
+    const index = slots.indexOf(i)
+    const invalid = interactive && p && labelError(p.label)
+    const attributes =
+      interactive && p
+        ? ` data-property-index="${index}" role="button" tabindex="0" aria-label="${esc(`Swap ${p.name}, position ${index + 1}`)}"${invalid ? ' aria-invalid="true"' : ""}`
+        : ""
+    tiles += `<g${attributes} transform="rotate(${side * 90} 500 500) translate(${x} 870)"><rect width="${w}" height="130" fill="${invalid ? "#fee2e2" : "#fffaf0"}" stroke="${invalid ? "#b42318" : "#334a43"}" stroke-width="${invalid ? 3 : 1.5}"/><rect width="${w}" height="22" fill="${color}"/><g transform="translate(${w / 2} 44) scale(.55)" fill="none" stroke="#334a43" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="${icons[p?.category ?? "other"] ?? icons.other}"/></g>${lines.map((line, n) => `<text x="${w / 2}" y="${65 + n * 13}" text-anchor="middle" font-size="10.5">${esc(line)}</text>`).join("")}</g>`
   }
   const titleLines = wrapLabel(board.title, 28)
   const title = titleLines.length > 3 ? ["Shorten title"] : titleLines

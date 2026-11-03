@@ -4,13 +4,14 @@ import {
   colorAt,
   designError,
   sample,
-  wrapLabel,
+  labelError,
   type Board,
   type Design,
   type Place,
   type Property,
 } from "../shared/board.ts"
 import { boardSvg } from "../shared/artwork.ts"
+import { FlatPreview } from "./FlatPreview.tsx"
 import { loadFont } from "./font.ts"
 const API = "/api/m/places.board"
 async function api<T>(path: string, method = "GET", body?: unknown): Promise<T> {
@@ -24,7 +25,7 @@ async function api<T>(path: string, method = "GET", body?: unknown): Promise<T> 
   if (!res.ok) throw new Error(result.error ?? "Request failed")
   return result
 }
-const styles = `.pb{--ink:#263f36;--paper:#fffaf0;color:var(--ink);max-width:1440px;margin:auto;padding:24px;font:14px/1.5 system-ui}.pb *{box-sizing:border-box}.pb h1{font:500 clamp(30px,4vw,48px)/1.1 Georgia,serif;margin:8px 0}.pb h2{font:500 24px Georgia,serif}.pb p{margin:8px 0 20px}.pb button,.pb input,.pb select{font:inherit;border:1px solid #b9c4b7;border-radius:8px;padding:9px 12px;color:var(--ink);background:#fffdf7}.pb button{cursor:pointer}.pb button:hover{background:#eee9db}.pb button:disabled{opacity:.45;cursor:not-allowed}.pb button.primary{background:var(--ink);color:white}.pb input{min-width:0}.pb .bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.pb .muted{color:#667469;font-size:12px}.pb .eyebrow{font-size:11px;letter-spacing:3px;text-transform:uppercase}.pb .gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px;margin-top:28px}.pb .card{padding:18px;background:#f3efdf;border:1px solid #d6dacb;border-radius:16px}.pb svg{display:block;width:100%;height:auto}.pb .workspace{display:grid;grid-template-columns:minmax(0,1fr) 350px;gap:24px;margin-top:20px;align-items:start}.pb .preview{background:#eeeade;padding:20px;border-radius:16px;position:sticky;top:16px}.pb .editor{background:#fffaf0;border:1px solid #d6dacb;border-radius:16px;padding:16px}.pb label{display:block;margin:10px 0 4px}.pb label input,.pb label select{display:block;width:100%;margin-top:4px}.pb .property{border-top:1px solid #dddcca;padding:12px 0}.pb .property-head{display:flex;align-items:center;gap:8px;font-size:12px}.pb .dot{width:12px;height:12px;border-radius:50%;flex:none}.pb .notice{padding:12px 16px;border-radius:8px;background:#fbe7d6;margin:12px 0}.pb .success{background:#e2eddf}.pb .three{height:540px;width:100%;touch-action:none}.pb .three canvas{display:block}.pb .list{max-height:320px;overflow:auto}.pb .list button{display:block;width:100%;text-align:left;margin:5px 0}.pb .toolbar{margin:16px 0}.pb .small{padding:4px 8px;font-size:12px}.pb details{margin:14px 0}.pb summary{cursor:pointer}.pb .modal{position:fixed;inset:0;background:#172c2580;display:grid;place-items:center;z-index:100;padding:20px}.pb .dialog{background:#fffaf0;border-radius:16px;padding:24px;width:min(540px,100%);max-height:85vh;overflow:auto}@media(max-width:850px){.pb{padding:14px}.pb .workspace{grid-template-columns:1fr}.pb .preview{position:static;padding:8px}.pb .three{height:360px}.pb .editor{width:100%}}`
+const styles = `.pb{--ink:#263f36;--paper:#fffaf0;color:var(--ink);max-width:1440px;margin:auto;padding:24px;font:14px/1.5 system-ui}.pb *{box-sizing:border-box}.pb h1{font:500 clamp(30px,4vw,48px)/1.1 Georgia,serif;margin:8px 0}.pb h2{font:500 24px Georgia,serif}.pb p{margin:8px 0 20px}.pb button,.pb input,.pb select{font:inherit;border:1px solid #b9c4b7;border-radius:8px;padding:9px 12px;color:var(--ink);background:#fffdf7}.pb button{cursor:pointer}.pb button:hover{background:#eee9db}.pb button:disabled{opacity:.45;cursor:not-allowed}.pb button.primary{background:var(--ink);color:white}.pb input{min-width:0}.pb .bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.pb .muted{color:#667469;font-size:12px}.pb .eyebrow{font-size:11px;letter-spacing:3px;text-transform:uppercase}.pb .gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px;margin-top:28px}.pb .card{padding:18px;background:#f3efdf;border:1px solid #d6dacb;border-radius:16px}.pb svg{display:block;width:100%;height:auto}.pb .workspace{display:grid;grid-template-columns:minmax(0,1fr) 350px;gap:24px;margin-top:20px;align-items:start}.pb .preview{background:#eeeade;padding:20px;border-radius:16px;position:sticky;top:16px}.pb .editor{background:#fffaf0;border:1px solid #d6dacb;border-radius:16px;padding:16px}.pb label{display:block;margin:10px 0 4px}.pb label input,.pb label select{display:block;width:100%;margin-top:4px}.pb .property{border-top:1px solid #dddcca;padding:12px 0}.pb .property.invalid{border-left:3px solid #b42318;padding-left:10px;background:#fff1f0}.pb input[aria-invalid="true"]{border:2px solid #b42318;background:#fff1f0}.pb .field-error{color:#b42318;font-size:12px;margin:4px 0 10px}.pb .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}.pb .property-head{display:flex;align-items:center;gap:8px;font-size:12px}.pb .dot{width:12px;height:12px;border-radius:50%;flex:none}.pb .notice{padding:12px 16px;border-radius:8px;background:#fbe7d6;margin:12px 0}.pb .success{background:#e2eddf}.pb .three{height:540px;width:100%;touch-action:none}.pb .three canvas{display:block}.pb .list{max-height:320px;overflow:auto}.pb .list button{display:block;width:100%;text-align:left;margin:5px 0}.pb .toolbar{margin:16px 0}.pb .small{padding:4px 8px;font-size:12px}.pb details{margin:14px 0}.pb summary{cursor:pointer}.pb .modal{position:fixed;inset:0;background:#172c2580;display:grid;place-items:center;z-index:100;padding:20px}.pb .dialog{background:#fffaf0;border-radius:16px;padding:24px;width:min(540px,100%);max-height:85vh;overflow:auto}@media(max-width:850px){.pb{padding:14px}.pb .workspace{grid-template-columns:1fr}.pb .preview{position:static;padding:8px}.pb .three{height:360px}.pb .editor{width:100%}}`
 function ThreePreview({ svg, onFail }: { svg: string; onFail: (message: string) => void }) {
   const root = useRef<HTMLDivElement>(null)
   const handle = useRef<{ dispose: () => void; reset: () => void } | null>(null)
@@ -318,7 +319,7 @@ export function BoardPage() {
                   <p>Choose a selection with at least 22 places, then auto-fill your board.</p>
                 </div>
               ) : view === "flat" ? (
-                <div dangerouslySetInnerHTML={{ __html: svg }} />
+                <FlatPreview board={draft} onChange={change} />
               ) : (
                 <ThreePreview
                   svg={svg}
@@ -450,7 +451,7 @@ export function BoardPage() {
                 </p>
               )}
               {draft.properties.map((p, i) => (
-                <div key={p.placeId} className="property">
+                <div key={p.placeId} className={`property${labelError(p.label) ? " invalid" : ""}`}>
                   <div className="property-head">
                     <span className="dot" style={{ background: colorAt(i) }} />
                     {i + 1}. {p.name}
@@ -460,7 +461,8 @@ export function BoardPage() {
                     <input
                       value={p.label}
                       maxLength={80}
-                      aria-invalid={wrapLabel(p.label).length > 4}
+                      aria-invalid={!!labelError(p.label)}
+                      aria-describedby={labelError(p.label) ? `label-error-${i}` : undefined}
                       onChange={(e) =>
                         change(
                           draft.properties.map((v, n) =>
@@ -470,6 +472,11 @@ export function BoardPage() {
                       }
                     />
                   </label>
+                  {labelError(p.label) && (
+                    <p className="field-error" id={`label-error-${i}`}>
+                      {labelError(p.label)}
+                    </p>
+                  )}
                   <div className="bar">
                     <button
                       className="small"

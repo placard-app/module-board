@@ -44,6 +44,19 @@ test("layout has 40 spaces, 22 properties, correct groups and escaped text", () 
   assert.ok(svg.includes("Missed"))
   assert.ok(!svg.includes("undefined"))
 })
+test("interactive preview identifies only places and highlights invalid labels without affecting print artwork", () => {
+  const d = design()
+  d.properties[0].name = 'A "quoted" <place>'
+  d.properties[0].label = "WWWWWWWWWWWWWW"
+  d.properties[10].label = " "
+  const preview = boardSvg(d, true)
+  assert.equal((preview.match(/data-property-index=/g) ?? []).length, 22)
+  assert.equal((preview.match(/aria-invalid="true"/g) ?? []).length, 2)
+  assert.ok(preview.includes("A &quot;quoted&quot; &lt;place&gt;"))
+  assert.ok(preview.includes('fill="#fee2e2"'))
+  assert.ok(!boardSvg(d).includes("data-property-index"))
+  assert.ok(!boardSvg(d).includes("#fee2e2"))
+})
 test("authenticated persistence, snapshots, owner isolation and revisions", async () => {
   const dir = mkdtempSync(join(tmpdir(), "placard-board-"))
   let available = places
