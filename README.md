@@ -8,7 +8,7 @@ This release is a board designer, not a playable game or complete game kit.
 
 Requires Placard SDK 1 with `persistent-data`, Node.js 24+, and an authenticated
 account. Build with `pnpm --filter @placard-official/places.board build` from the
-plugins workspace, then upload `dist/places.board-0.1.0.placard-module` (or its ZIP)
+plugins workspace, then upload `dist/places.board-0.2.0.placard-module` (or its ZIP)
 in **Settings → Module marketplace**. Enable the module and show it in navigation.
 Open **Board** from navigation or **Open Board Designer** from the command palette.
 No release has to be published to install the local artifact.

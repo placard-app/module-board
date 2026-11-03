@@ -1,7 +1,7 @@
 {
   "id": "places.board",
   "name": "Board",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Turn 22 favorite places into a printable travel board.",
   "permissions": [
     "places.read",

@@ -22,7 +22,7 @@ test("Marketplace board designer, exports, 3D and retention", async ({ page, bas
       headers,
       data: {
         filename: "places.board.zip",
-        contentBase64: readFileSync("dist/places.board-0.1.0.zip").toString("base64"),
+        contentBase64: readFileSync("dist/places.board-0.2.0.zip").toString("base64"),
       },
     })
   const installed = await upload()
