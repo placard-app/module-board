@@ -1,0 +1,36 @@
+{
+  "name": "@placard-official/places.board",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Your places as a printable travel board",
+  "engines": {
+    "node": ">=24"
+  },
+  "type": "module",
+  "scripts": {
+    "build": "node ./scripts/build.mjs",
+    "build:zip": "node ./scripts/build.mjs",
+    "typecheck": "tsc --noEmit",
+    "test": "node --experimental-strip-types --test tests/*.test.ts",
+    "test:e2e": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.1",
+    "@types/node": "^26.6.6",
+    "@types/react": "^19.2.0",
+    "esbuild": "^0.28.2",
+    "fflate": "^0.8.3",
+    "react": "^19.2.0",
+    "react-router": "^7.9.0",
+    "typescript": "6.0.3",
+    "@types/three": "^0.183.0",
+    "react-dom": "^19.2.0",
+    "@types/react-dom": "^19.2.0"
+  },
+  "dependencies": {
+    "three": "^0.185.0",
+    "jspdf": "^4.2.0",
+    "svg2pdf.js": "^2.7.0"
+  },
+  "license": "AGPL-3.0-only"
+}
