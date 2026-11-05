@@ -22,7 +22,7 @@ test("Marketplace board designer, exports, 3D and retention", async ({ page, bas
       headers,
       data: {
         filename: "places.board.zip",
-        contentBase64: readFileSync("dist/places.board-0.2.1.zip").toString("base64"),
+        contentBase64: readFileSync("dist/places.board-0.2.2.zip").toString("base64"),
       },
     })
   const installed = await upload()
@@ -59,10 +59,31 @@ test("Marketplace board designer, exports, 3D and retention", async ({ page, bas
   expect(to).toBeTruthy()
   await page.mouse.move(from!.x + from!.width / 2, from!.y + from!.height / 2)
   await page.mouse.down()
+  await expect(page.locator(".drag-preview")).toHaveCount(0)
+  const startX = from!.x + from!.width / 2
+  const startY = from!.y + from!.height / 2
+  await page.mouse.move(startX - 40, startY - 40, { steps: 4 })
+  const ghost = page.locator(".drag-preview")
+  await expect(ghost).toBeVisible()
+  await expect(ghost).toContainText(firstLabel)
+  const floating = await ghost.boundingBox()
+  expect(Math.abs(floating!.x - (from!.x - 40))).toBeLessThan(1.5)
+  expect(Math.abs(floating!.y - (from!.y - 40))).toBeLessThan(1.5)
+  await page.locator(".preview").screenshot({ path: "test-results/board-drag.png" })
   await page.mouse.move(to!.x + to!.width / 2, to!.y + to!.height / 2, { steps: 12 })
   await page.mouse.up()
+  await expect(page.locator(".drag-preview")).toHaveCount(0)
   await expect(labels.nth(0)).toHaveValue(distantLabel)
   await expect(labels.nth(10)).toHaveValue(firstLabel)
+  // Escape removes the floating tile and cancels the drag.
+  await page.mouse.move(from!.x + from!.width / 2, from!.y + from!.height / 2)
+  await page.mouse.down()
+  await page.mouse.move(startX - 40, startY - 40)
+  await expect(ghost).toBeVisible()
+  await page.keyboard.press("Escape")
+  await expect(ghost).toHaveCount(0)
+  await page.mouse.up()
+  await expect(labels.nth(0)).toHaveValue(distantLabel)
   // Keyboard swapping restores the original order.
   await tiles.nth(0).focus()
   await page.keyboard.press("Enter")
