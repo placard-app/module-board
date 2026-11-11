@@ -32,5 +32,6 @@
     "jspdf": "^4.2.0",
     "svg2pdf.js": "^2.7.0"
   },
-  "license": "AGPL-3.0-only"
+  "license": "AGPL-3.0-only",
+  "packageManager": "pnpm@12.4.1"
 }

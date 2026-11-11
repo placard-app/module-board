@@ -7,7 +7,7 @@ This release is a board designer, not a playable game or complete game kit.
 ## Install
 
 Requires Placard SDK 1 with `persistent-data`, Node.js 24+, and an authenticated
-account. Build with `pnpm --filter @placard-official/places.board build` from the
+account. Build with `pnpm build` from the
 plugins workspace, then upload `dist/places.board-0.2.0.placard-module` (or its ZIP)
 in **Settings → Module marketplace**. Enable the module and show it in navigation.
 Open **Board** from navigation or **Open Board Designer** from the command palette.
@@ -61,10 +61,10 @@ from clients. No core tables or MCP tools are added.
 ## Validation
 
 ```
-pnpm --filter @placard-official/places.board typecheck
-pnpm --filter @placard-official/places.board test
-pnpm --filter @placard-official/places.board build
-pnpm --filter @placard-official/places.board test:e2e
+pnpm typecheck
+pnpm test
+pnpm build
+pnpm test:e2e
 ```
 
 Browser tests require Docker, Chromium installed through Playwright, and the sibling
@@ -75,3 +75,7 @@ Check rendered PDFs for clipping, typography, tile overlap and scale.
 
 DejaVu Sans is bundled under its accompanying font license. Application source is
 AGPL-3.0-only. V1 uses English labels, one theme, and no public board sharing.
+
+## Standalone releases
+
+Install from https://github.com/placard-app/module-board. Merge the manifest and package version change through a pull request. Tag the merged commit as `places.board@<version>` to publish both archives.
